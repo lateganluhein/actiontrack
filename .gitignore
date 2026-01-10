@@ -20,5 +20,10 @@ yarn-error.log
 # Claude
 .claude/
 
+/storage/app
+/storage/framework
+/storage/logs
+!/storage/.gitignore
+
 # Flutter App
 /actiontrack_app/
