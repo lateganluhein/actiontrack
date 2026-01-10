@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeEmail;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -44,6 +46,14 @@ class RegisterController extends Controller
             'daily_summary_time' => '07:00:00',
             'email_notifications' => true,
         ]);
+
+        // Send welcome email
+        try {
+            Mail::to($user->email)->send(new WelcomeEmail($user));
+        } catch (\Exception $e) {
+            // Log the error but don't block registration
+            \Log::error('Failed to send welcome email: ' . $e->getMessage());
+        }
 
         Auth::login($user);
 
