@@ -3,8 +3,13 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/manycez2q2t3/actiontrack
     - /bin/mkdir -p $DEPLOYPATH
-    - /bin/cp -R app bootstrap config database resources routes storage artisan composer.json composer.lock $DEPLOYPATH/
-    - cd $DEPLOYPATH && php composer.phar install --no-dev --optimize-autoloader 2>/dev/null || true
-    - cd $DEPLOYPATH && php artisan config:cache
-    - cd $DEPLOYPATH && php artisan route:cache
-    - cd $DEPLOYPATH && php artisan view:cache
+    - /bin/mkdir -p $DEPLOYPATH/storage/framework/sessions
+    - /bin/mkdir -p $DEPLOYPATH/storage/framework/views
+    - /bin/mkdir -p $DEPLOYPATH/storage/framework/cache
+    - /bin/mkdir -p $DEPLOYPATH/storage/logs
+    - /bin/cp -R app bootstrap config database public resources routes storage artisan composer.json composer.lock $DEPLOYPATH/
+    - cd $DEPLOYPATH && /usr/local/bin/ea-php84 composer.phar install --no-dev --optimize-autoloader 2>/dev/null || true
+    - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan migrate --force 2>/dev/null || true
+    - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan config:cache
+    - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan route:cache
+    - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan view:cache
