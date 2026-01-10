@@ -40,6 +40,7 @@ class BroadcastMessage extends Mailable
     {
         return new Content(
             view: 'emails.broadcast',
+            text: 'emails.broadcast-text',
             with: [
                 'recipient' => $this->recipient,
                 'emailMessage' => $this->emailMessage,

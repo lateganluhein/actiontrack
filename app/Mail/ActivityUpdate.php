@@ -42,6 +42,7 @@ class ActivityUpdate extends Mailable
     {
         return new Content(
             view: 'emails.activity-update',
+            text: 'emails.activity-update-text',
             with: [
                 'activity' => $this->activity,
                 'recipient' => $this->recipient,

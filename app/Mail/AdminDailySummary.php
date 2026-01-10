@@ -47,6 +47,7 @@ class AdminDailySummary extends Mailable
 
         return new Content(
             view: 'emails.admin-daily-summary',
+            text: 'emails.admin-daily-summary-text',
             with: [
                 'activities' => $this->activities,
                 'users' => $this->users,

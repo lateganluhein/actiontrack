@@ -43,6 +43,7 @@ class PersonalSummary extends Mailable
 
         return new Content(
             view: 'emails.personal-summary',
+            text: 'emails.personal-summary-text',
             with: [
                 'person' => $this->person,
                 'asLead' => $asLead,

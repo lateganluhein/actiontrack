@@ -49,6 +49,7 @@ class DailySummary extends Mailable
 
         return new Content(
             view: 'emails.daily-summary',
+            text: 'emails.daily-summary-text',
             with: [
                 'user' => $this->user,
                 'overdue' => $overdue,
