@@ -64,7 +64,7 @@ class SendDailySummaries extends Command
     }
 
     /**
-     * Send statistics to admin (no activity details for privacy).
+     * Send master summary to admin email.
      */
     protected function sendAdminSummary(): int
     {
@@ -79,7 +79,7 @@ class SendDailySummaries extends Command
             if ($ua->isNotEmpty()) {
                 $userStats[] = ['name' => $user->name, 'total' => $ua->count(),
                     'in_progress' => $ua->where('status', 'in_progress')->count(),
-                    'overdue' => $ua->filter(fn($a) => $a->is_overdue)->count(),
+                    'overdue' => $ua->filter(fn($a) => $a->is_overdue)->values()->count(),
                     'completed' => $ua->where('status', 'completed')->count()];
             }
         }
@@ -88,8 +88,8 @@ class SendDailySummaries extends Command
                 'new_today' => User::whereDate('created_at', today())->count(), 'new_this_week' => User::where('created_at', '>=', now()->subDays(7))->count()],
             'activities' => ['total' => $allActivities->count(), 'in_progress' => $allActivities->where('status', 'in_progress')->count(),
                 'completed' => $allActivities->where('status', 'completed')->count(), 'cancelled' => $allActivities->where('status', 'cancelled')->count(),
-                'overdue' => $allActivities->filter(fn($a) => $a->is_overdue)->count(),
-                'due_soon' => $allActivities->filter(fn($a) => !$a->is_overdue && $a->days_until_due !== null && $a->days_until_due >= 0 && $a->days_until_due <= 7)->count()],
+                'overdue' => $allActivities->filter(fn($a) => $a->is_overdue)->values()->count(),
+                'due_soon' => $allActivities->filter(fn($a) => !$a->is_overdue && $a->days_until_due !== null && $a->days_until_due >= 0 && $a->days_until_due <= 7)->values()->count()],
             'contacts' => ['total' => Person::withoutGlobalScope('user')->count()], 'per_user' => $userStats];
 
         if ($this->option('dry-run')) { $this->info("   [DRY RUN] Would send to {$adminEmail}"); return 0; }

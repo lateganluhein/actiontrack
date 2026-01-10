@@ -2,161 +2,95 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Master Activity Summary</title>
+    <title>ActionTrack Daily Statistics</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
-        .container { background: #fff; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1a1a1a; padding-bottom: 20px; background: #1a1a1a; margin: -30px -30px 30px; padding: 30px; border-radius: 8px 8px 0 0; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .container { background: #fff; border-radius: 8px; padding: 30px; }
+        .header { text-align: center; margin-bottom: 30px; background: #1a1a1a; margin: -30px -30px 30px; padding: 30px; border-radius: 8px 8px 0 0; }
         .logo { font-size: 24px; font-weight: bold; color: #d4a574; }
-        .logo-icon { margin-right: 8px; }
         h1 { color: #fff; font-size: 24px; margin: 10px 0 0; }
-        .subtitle { color: #ccc; margin: 10px 0 0; }
-        h2 { color: #1a1a1a; font-size: 18px; margin: 25px 0 15px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
-        .stats { display: flex; justify-content: space-around; text-align: center; margin: 20px 0; padding: 15px; background: #f8f8f8; border-radius: 8px; }
-        .stat { padding: 0 15px; }
+        .subtitle { color: #ccc; }
+        h2 { color: #1a1a1a; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 8px; }      
+        .stat-grid { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0; }
+        .stat-box { background: #f8f8f8; padding: 15px; border-radius: 8px; text-align: center; min-width: 100px; }
         .stat-number { font-size: 28px; font-weight: bold; display: block; }
-        .stat-label { font-size: 12px; color: #666; text-transform: uppercase; }
-        .stat-overdue .stat-number { color: #ef4444; }
-        .stat-due-soon .stat-number { color: #f59e0b; }
-        .stat-in-progress .stat-number { color: #3b82f6; }
-        .stat-users .stat-number { color: #10b981; }
-        .activity-list { list-style: none; padding: 0; margin: 0; }
-        .activity-item { padding: 12px; border-bottom: 1px solid #eee; }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-name { font-weight: 600; color: #1a1a1a; }
-        .activity-meta { font-size: 13px; color: #666; margin-top: 4px; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-        .badge-overdue { background: #fee2e2; color: #dc2626; }
-        .badge-urgent { background: #ffedd5; color: #ea580c; }
-        .badge-soon { background: #dbeafe; color: #2563eb; }
-        .badge-user { background: #e5e7eb; color: #374151; }
-        .section-overdue h2 { color: #dc2626; }
-        .section-due-soon h2 { color: #ea580c; }
-        .empty-message { color: #666; font-style: italic; padding: 15px; text-align: center; }
+        .stat-label { font-size: 12px; color: #666; }
+        .red { color: #dc2626; }
+        .orange { color: #ea580c; }
+        .blue { color: #3b82f6; }
+        .green { color: #10b981; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f8f8; }
         .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo"><span class="logo-icon">🏢</span>ManyCents Resources</div>
-            <h1>Master Activity Summary</h1>
-            <p class="subtitle">{{ now()->format('l, d F Y') }}</p>
+            <div class="logo">ActionTrack</div>
+            <h1>Daily Statistics Report</h1>
+            <p class="subtitle">{{ $stats['date'] }}</p>
         </div>
 
-        <p>This is the daily master summary of all activities across all users.</p>
+        <h2>User Statistics</h2>
+        <div class="stat-grid">
+            <div class="stat-box">
+                <span class="stat-number blue">{{ $stats['users']['total'] }}</span>
+                <span class="stat-label">Total Users</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number green">{{ $stats['users']['active'] }}</span>
+                <span class="stat-label">Active Users</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number">{{ $stats['users']['new_this_week'] }}</span>
+                <span class="stat-label">New This Week</span>
+            </div>
+        </div>
 
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat stat-overdue">
-                <span class="stat-number">{{ $overdue->count() }}</span>
+        <h2>Activity Statistics</h2>
+        <div class="stat-grid">
+            <div class="stat-box">
+                <span class="stat-number red">{{ $stats['activities']['overdue'] }}</span>
                 <span class="stat-label">Overdue</span>
             </div>
-            <div class="stat stat-due-soon">
-                <span class="stat-number">{{ $dueSoon->count() }}</span>
+            <div class="stat-box">
+                <span class="stat-number orange">{{ $stats['activities']['due_soon'] }}</span>
                 <span class="stat-label">Due Soon</span>
             </div>
-            <div class="stat stat-in-progress">
-                <span class="stat-number">{{ $inProgress->count() }}</span>
+            <div class="stat-box">
+                <span class="stat-number blue">{{ $stats['activities']['in_progress'] }}</span>
                 <span class="stat-label">In Progress</span>
             </div>
-            <div class="stat stat-users">
-                <span class="stat-number">{{ $users->count() }}</span>
-                <span class="stat-label">Users</span>
+            <div class="stat-box">
+                <span class="stat-number green">{{ $stats['activities']['completed'] }}</span>
+                <span class="stat-label">Completed</span>
             </div>
         </div>
 
-        <!-- Overdue Activities -->
-        @if($overdue->isNotEmpty())
-        <div class="section-overdue">
-            <h2>🚨 Overdue Activities ({{ $overdue->count() }})</h2>
-            <ul class="activity-list">
-                @foreach($overdue as $activity)
-                <li class="activity-item">
-                    <div class="activity-name">{{ $activity->name }}</div>
-                    <div class="activity-meta">
-                        <span class="badge badge-overdue">{{ abs($activity->days_until_due) }} day(s) overdue</span>
-                        @if($activity->lead)
-                            &middot; Lead: {{ $activity->lead->full_name }}
-                        @endif
-                        @if($activity->user)
-                            &middot; <span class="badge badge-user">{{ $activity->user->name }}</span>
-                        @endif
-                    </div>
-                </li>
-                @endforeach
-            </ul>
-        </div>
+        <h2>Per User Breakdown</h2>
+        @if(count($stats['per_user']) > 0)
+        <table>
+            <tr><th>User</th><th>Total</th><th>Active</th><th>Overdue</th><th>Done</th></tr>
+            @foreach($stats['per_user'] as $user)
+            <tr>
+                <td>{{ $user['name'] }}</td>
+                <td>{{ $user['total'] }}</td>
+                <td>{{ $user['in_progress'] }}</td>
+                <td class="red">{{ $user['overdue'] }}</td>
+                <td class="green">{{ $user['completed'] }}</td>
+            </tr>
+            @endforeach
+        </table>
+        @else
+        <p>No user activity yet.</p>
         @endif
 
-        <!-- Due Soon Activities -->
-        @if($dueSoon->isNotEmpty())
-        <div class="section-due-soon">
-            <h2>⏰ Due Soon ({{ $dueSoon->count() }})</h2>
-            <ul class="activity-list">
-                @foreach($dueSoon as $activity)
-                <li class="activity-item">
-                    <div class="activity-name">{{ $activity->name }}</div>
-                    <div class="activity-meta">
-                        @if($activity->days_until_due === 0)
-                            <span class="badge badge-urgent">Due today</span>
-                        @elseif($activity->days_until_due <= 2)
-                            <span class="badge badge-urgent">{{ $activity->days_until_due }} day(s) left</span>
-                        @else
-                            <span class="badge badge-soon">{{ $activity->days_until_due }} days left</span>
-                        @endif
-                        @if($activity->lead)
-                            &middot; Lead: {{ $activity->lead->full_name }}
-                        @endif
-                        @if($activity->user)
-                            &middot; <span class="badge badge-user">{{ $activity->user->name }}</span>
-                        @endif
-                    </div>
-                </li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
-        <!-- All In Progress (if no overdue or due soon) -->
-        @if($inProgress->isNotEmpty() && $overdue->isEmpty() && $dueSoon->isEmpty())
-        <div>
-            <h2>🔄 In Progress ({{ $inProgress->count() }})</h2>
-            <ul class="activity-list">
-                @foreach($inProgress->take(15) as $activity)
-                <li class="activity-item">
-                    <div class="activity-name">{{ $activity->name }}</div>
-                    <div class="activity-meta">
-                        @if($activity->due_date)
-                            Due: {{ $activity->due_date->format('d M Y') }}
-                        @else
-                            No due date
-                        @endif
-                        @if($activity->lead)
-                            &middot; Lead: {{ $activity->lead->full_name }}
-                        @endif
-                        @if($activity->user)
-                            &middot; <span class="badge badge-user">{{ $activity->user->name }}</span>
-                        @endif
-                    </div>
-                </li>
-                @endforeach
-            </ul>
-            @if($inProgress->count() > 15)
-                <p style="color: #666; font-size: 13px; text-align: center;">
-                    And {{ $inProgress->count() - 15 }} more activities...
-                </p>
-            @endif
-        </div>
-        @endif
-
-        @if($totalCount === 0)
-        <p class="empty-message">No active activities across all users.</p>
-        @endif
+        <p><strong>Total Contacts:</strong> {{ $stats['contacts']['total'] }}</p>
 
         <div class="footer">
-            <p>This is an automated master summary from ActionTrack.</p>
+            <p>This is an automated statistics report. No activity details are shown for privacy.</p>    
             <p>&copy; {{ date('Y') }} ManyCents</p>
         </div>
     </div>

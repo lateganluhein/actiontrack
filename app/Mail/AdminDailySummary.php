@@ -17,8 +17,7 @@ class AdminDailySummary extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        public Collection $activities,
-        public Collection $users
+        public array $stats
     ) {}
 
     /**
@@ -27,7 +26,7 @@ class AdminDailySummary extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Master Activity Summary - ' . now()->format('d M Y'),
+            subject: 'ActionTrack Daily Statistics - ' . now()->format('d M Y'),
         );
     }
 
@@ -36,25 +35,11 @@ class AdminDailySummary extends Mailable
      */
     public function content(): Content
     {
-        $overdue = $this->activities->filter(fn($a) => $a->is_overdue);
-        $dueSoon = $this->activities->filter(fn($a) =>
-            !$a->is_overdue &&
-            $a->days_until_due !== null &&
-            $a->days_until_due >= 0 &&
-            $a->days_until_due <= 7
-        );
-        $inProgress = $this->activities->where('status', 'in_progress');
-
         return new Content(
             view: 'emails.admin-daily-summary',
             text: 'emails.admin-daily-summary-text',
             with: [
-                'activities' => $this->activities,
-                'users' => $this->users,
-                'overdue' => $overdue,
-                'dueSoon' => $dueSoon,
-                'inProgress' => $inProgress,
-                'totalCount' => $this->activities->count(),
+                'stats' => $this->stats,
             ],
         );
     }
