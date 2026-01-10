@@ -1,0 +1,10 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/manycez2q2t3/actiontrack
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -R app bootstrap config database resources routes storage artisan composer.json composer.lock $DEPLOYPATH/
+    - cd $DEPLOYPATH && php composer.phar install --no-dev --optimize-autoloader 2>/dev/null || true
+    - cd $DEPLOYPATH && php artisan config:cache
+    - cd $DEPLOYPATH && php artisan route:cache
+    - cd $DEPLOYPATH && php artisan view:cache
