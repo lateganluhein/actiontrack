@@ -64,45 +64,39 @@ class SendDailySummaries extends Command
     }
 
     /**
-     * Send master summary to admin email.
+     * Send statistics to admin (no activity details for privacy).
      */
     protected function sendAdminSummary(): int
     {
         $adminEmail = config('app.admin_email');
+        if (!$adminEmail) { $this->warn('ADMIN_EMAIL not configured'); return 0; }
+        $this->info('Sending statistics to admin...');
 
-        if (!$adminEmail) {
-            $this->warn('ADMIN_EMAIL not configured, skipping admin summary.');
-            return 0;
+        $allActivities = Activity::withoutGlobalScope('user')->get();
+        $userStats = [];
+        foreach (User::all() as $user) {
+            $ua = Activity::withoutGlobalScope('user')->where('user_id', $user->id)->get();
+            if ($ua->isNotEmpty()) {
+                $userStats[] = ['name' => $user->name, 'total' => $ua->count(),
+                    'in_progress' => $ua->where('status', 'in_progress')->count(),
+                    'overdue' => $ua->filter(fn($a) => $a->is_overdue)->count(),
+                    'completed' => $ua->where('status', 'completed')->count()];
+            }
         }
+        $stats = ['date' => now()->format('l, d F Y'),
+            'users' => ['total' => User::count(), 'active' => User::whereHas('settings', fn($q) => $q->where('daily_summary_enabled', true))->count(),
+                'new_today' => User::whereDate('created_at', today())->count(), 'new_this_week' => User::where('created_at', '>=', now()->subDays(7))->count()],
+            'activities' => ['total' => $allActivities->count(), 'in_progress' => $allActivities->where('status', 'in_progress')->count(),
+                'completed' => $allActivities->where('status', 'completed')->count(), 'cancelled' => $allActivities->where('status', 'cancelled')->count(),
+                'overdue' => $allActivities->filter(fn($a) => $a->is_overdue)->count(),
+                'due_soon' => $allActivities->filter(fn($a) => !$a->is_overdue && $a->days_until_due !== null && $a->days_until_due >= 0 && $a->days_until_due <= 7)->count()],
+            'contacts' => ['total' => Person::withoutGlobalScope('user')->count()], 'per_user' => $userStats];
 
-        $this->info('📊 Sending master summary to admin...');
-
-        // Get all in-progress activities from all users
-        $activities = Activity::withoutGlobalScope('user')
-            ->where('status', 'in_progress')
-            ->with(['lead', 'user'])
-            ->get();
-
-        $users = User::all();
-
-        if ($activities->isEmpty()) {
-            $this->line("   No active activities, skipping admin summary.");
-            return 0;
-        }
-
-        if ($this->option('dry-run')) {
-            $this->info("   [DRY RUN] Would send master summary to {$adminEmail}: {$activities->count()} activities");
-            return 0;
-        }
-
+        if ($this->option('dry-run')) { $this->info("   [DRY RUN] Would send to {$adminEmail}"); return 0; }
         try {
-            Mail::to($adminEmail)->send(new AdminDailySummary($activities, $users));
-            $this->info("   ✓ Master summary sent to {$adminEmail}: {$activities->count()} activities");
-            return 0;
-        } catch (\Exception $e) {
-            $this->error("   ✗ Failed to send admin summary: {$e->getMessage()}");
-            return 1;
-        }
+            Mail::to($adminEmail)->send(new AdminDailySummary($stats));
+            $this->info("   Statistics sent to {$adminEmail}"); return 0;
+        } catch (\Exception $e) { $this->error("   Failed: " . $e->getMessage()); return 1; }
     }
 
     /**

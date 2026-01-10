@@ -27,7 +27,7 @@ class AdminDailySummary extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Master Activity Summary - ' . now()->format('d M Y'),
+            subject: 'ActionTrack Daily Statistics - ' . now()->format('d M Y'),
         );
     }
 
