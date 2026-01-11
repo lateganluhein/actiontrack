@@ -8,7 +8,96 @@
 </div>
 
 <div class="form-container">
-    <form method="POST" action="{{ route('settings.update') }}" class="settings-form">
+    <!-- Profile Information -->
+    <form method="POST" action="{{ route('settings.profile.update') }}" class="settings-form">
+        @csrf
+        @method('PUT')
+
+        <div class="settings-section">
+            <h3 class="settings-section-title">Profile Information</h3>
+
+            <div class="form-group">
+                <label for="name" class="form-label">Name</label>
+                <input type="text"
+                       id="name"
+                       name="name"
+                       value="{{ old('name', auth()->user()->name) }}"
+                       class="form-input @error('name') is-invalid @enderror"
+                       required>
+                @error('name')
+                    <span class="form-error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       value="{{ old('email', auth()->user()->email) }}"
+                       class="form-input @error('email') is-invalid @enderror"
+                       required>
+                @error('email')
+                    <span class="form-error">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">Update Profile</button>
+        </div>
+    </form>
+
+    <!-- Change Password -->
+    <form method="POST" action="{{ route('settings.password.update') }}" class="settings-form" style="margin-top: 2rem;">
+        @csrf
+        @method('PUT')
+
+        <div class="settings-section">
+            <h3 class="settings-section-title">Change Password</h3>
+
+            <div class="form-group">
+                <label for="current_password" class="form-label">Current Password</label>
+                <input type="password"
+                       id="current_password"
+                       name="current_password"
+                       class="form-input @error('current_password') is-invalid @enderror"
+                       required>
+                @error('current_password')
+                    <span class="form-error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">New Password</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-input @error('password') is-invalid @enderror"
+                       required>
+                @error('password')
+                    <span class="form-error">{{ $message }}</span>
+                @enderror
+                <small class="form-hint">Password must be at least 8 characters</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                <input type="password"
+                       id="password_confirmation"
+                       name="password_confirmation"
+                       class="form-input"
+                       required>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">Change Password</button>
+        </div>
+    </form>
+
+    <!-- Email Notifications -->
+    <form method="POST" action="{{ route('settings.update') }}" class="settings-form" style="margin-top: 2rem;">
         @csrf
         @method('PUT')
 
@@ -48,21 +137,6 @@
                     <span>Receive email notifications</span>
                 </label>
                 <small class="form-hint">Get notified about activity updates</small>
-            </div>
-        </div>
-
-        <div class="settings-section">
-            <h3 class="settings-section-title">Account Information</h3>
-
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Name</span>
-                    <span class="detail-value">{{ auth()->user()->name }}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Email</span>
-                    <span class="detail-value">{{ auth()->user()->email }}</span>
-                </div>
             </div>
         </div>
 
