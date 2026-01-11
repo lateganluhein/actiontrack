@@ -28,3 +28,8 @@ yarn-error.log
 
 # Flutter App
 /actiontrack_app/
+
+# Ignore miscellaneous local files
+Admin.txt
+After Your Computer Restarts.txt
+.env.txt

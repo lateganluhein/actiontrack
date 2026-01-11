@@ -2,8 +2,15 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/manycez2q2t3/actiontrack
+    - echo "--- Running git status before deployment tasks ---"
+    - cd $DEPLOYPATH && git status --untracked-files=all --porcelain
+    - echo "--- Running deployment tasks ---"
     - cd $DEPLOYPATH && /usr/local/bin/ea-php84 composer.phar install --no-dev --optimize-autoloader
     - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan migrate --force
     - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan config:cache
     - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan route:cache
     - cd $DEPLOYPATH && /usr/local/bin/ea-php84 artisan view:cache
+    - echo "--- Running git status after deployment tasks ---"
+    - cd $DEPLOYPATH && git status --untracked-files=all --porcelain
+    - echo "--- Listing all files ---"
+    - cd $DEPLOYPATH && ls -laR
