@@ -1,7 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/manycez2q2t3/public_html/actiontrack/
-    - /bin/cp -R * $DEPLOYPATH
-    - /bin/cp -R .env.example $DEPLOYPATH
-    - /bin/cp -R .htaccess $DEPLOYPATH
+    - export DEPLOYPATH=/home/manycez2q2t3/actiontrack
+    - /bin/echo "Minimal deployment script executed."
