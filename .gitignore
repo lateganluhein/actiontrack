@@ -33,3 +33,5 @@ yarn-error.log
 Admin.txt
 After Your Computer Restarts.txt
 .env.txt
+phpinfo.php
+public/phpinfo.php
