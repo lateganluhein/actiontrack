@@ -35,3 +35,7 @@ After Your Computer Restarts.txt
 .env.txt
 phpinfo.php
 public/phpinfo.php
+
+# Server-generated files
+error_log
+*/error_log
